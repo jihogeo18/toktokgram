@@ -70,7 +70,7 @@ function isAdmin(req) {
 function clientIp(req) {
   return (req.headers["x-forwarded-for"] || "").split(",")[0].trim() || req.socket.remoteAddress;
 }
-const lastPost = new Map(); // 도배 방지: IP당 2초에 1개
+const lastPost = new Map(); // 도배 방지: 기기당 2초에 1개
 
 function serveFile(res, file) {
   const full = path.join(PUBLIC_DIR, file);
@@ -110,10 +110,13 @@ const server = http.createServer(async (req, res) => {
       if (!name) return send(res, 400, { error: "이름을 입력해 주세요." });
       if (!content) return send(res, 400, { error: "내용을 입력해 주세요." });
       if (comments.length >= MAX_COMMENTS) return send(res, 400, { error: "댓글이 가득 찼어요. 선생님께 알려 주세요." });
-      const ip = clientIp(req);
+      // 도배 방지는 기기별로 적용 (같은 와이파이의 여러 사람은 IP가 같을 수 있음)
+      const cid = clean(body.clientId, 64);
+      const who = cid ? "c:" + cid : "ip:" + clientIp(req);
       const now = Date.now();
-      if (now - (lastPost.get(ip) || 0) < 2000) return send(res, 429, { error: "조금 천천히 보내 주세요." });
-      lastPost.set(ip, now);
+      if (now - (lastPost.get(who) || 0) < 2000) return send(res, 429, { error: "조금 천천히 보내 주세요." });
+      lastPost.set(who, now);
+      if (lastPost.size > 5000) lastPost.clear();
       const c = { id: crypto.randomUUID(), postId, name, content, likes: 0, createdAt: now, hidden: false };
       comments.push(c);
       bump();
