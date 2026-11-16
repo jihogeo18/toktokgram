@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>톡톡그램 관리</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="/style.css">
+<style>body{max-width:none;padding-bottom:20px}</style>
+</head>
+<body>
+<div class="admin">
+  <h1>톡톡그램 관리 (교사용)</h1>
+  <p>장난 댓글은 <b>숨기기</b>(학생 화면에서 안 보임) 또는 <b>삭제</b>하세요. 시연 전에는 <b>전체 초기화</b>로 댓글을 비울 수 있어요.</p>
+  <p>
+    <button class="btn" id="refresh">새로고침</button>
+    <button class="btn danger" id="reset">전체 초기화</button>
+    <a class="btn" href="/qr" target="_blank">QR 화면 열기</a>
+    <a class="btn" href="/" target="_blank">학생 화면 열기</a>
+  </p>
+  <div id="list">불러오는 중…</div>
+</div>
+<script src="/admin.js"></script>
+</body>
+</html>
