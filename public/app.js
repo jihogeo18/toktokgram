@@ -53,6 +53,8 @@ let liked = new Set(store.get("tt_liked", []));
 let postLiked = new Set(store.get("tt_postliked", []));
 let comments = [];
 let version = 0;
+let clientId = store.get("tt_cid", "");
+if (!clientId) { clientId = Math.random().toString(36).slice(2) + Date.now().toString(36); store.set("tt_cid", clientId); }
 
 function timeAgo(ts) {
   const s = Math.floor((Date.now() - ts) / 1000);
@@ -90,7 +92,6 @@ function renderFeed() {
       <form class="composer" data-post="${p.id}" autocomplete="off">
         <div class="row">
           <input class="name" name="author" maxlength="20" placeholder="이름" value="${esc(savedName)}" required>
-
         </div>
         <div class="row">
           <textarea name="content" rows="1" maxlength="300" placeholder="${p.author}에게 댓글 달기…" required></textarea>
@@ -170,7 +171,7 @@ document.addEventListener("submit", async (e) => {
     const r = await fetch("/api/comments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ postId: form.dataset.post, name, content }),
+      body: JSON.stringify({ postId: form.dataset.post, name, content, clientId }),
     });
     const data = await r.json();
     if (!r.ok) throw new Error(data.error || "보내지 못했어요.");
